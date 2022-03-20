@@ -1,0 +1,132 @@
+{
+  "name": "Weather Sms",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 8
+            }
+          ]
+        }
+      },
+      "name": "Cron",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$node[\"OpenWeatherMap\"].json[\"main\"][\"feels_like\"]}}",
+              "value2": 18
+            }
+          ]
+        }
+      },
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "from": "+18066660114",
+        "to": "4703808470",
+        "message": "=Wear a sweater today, it is {{$node[\"OpenWeatherMap\"].json[\"main\"][\"feels_like\"]}}°C outside right now.",
+        "options": {}
+      },
+      "name": "Twilio",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        300
+      ],
+      "credentials": {
+        "twilioApi": {
+          "id": "2",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "locationSelection": "zipCode",
+        "zipCode": "30041"
+      },
+      "name": "OpenWeatherMap",
+      "type": "n8n-nodes-base.openWeatherMap",
+      "typeVersion": 1,
+      "position": [
+        680,
+        460
+      ],
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "3",
+          "name": "OpenWeatherMap account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Cron": {
+      "main": [
+        [
+          {
+            "node": "OpenWeatherMap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Twilio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenWeatherMap": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "saveExecutionProgress": "DEFAULT"
+  },
+  "id": 1
+}
